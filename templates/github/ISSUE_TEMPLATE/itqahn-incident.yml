@@ -1,0 +1,227 @@
+name: Itqahn Incident
+description: Report an incident for tracking and resolution
+title: "[Incident] "
+labels: ["incident", "itqahn"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Itqahn Incident Template
+        Use this template to report and track incidents.
+        Incidents are automatically escalated based on severity.
+
+  - type: input
+    id: incident_id
+    attributes:
+      label: Incident ID
+      description: Unique identifier (auto-generated if blank)
+      placeholder: "inc-"
+    validations:
+      required: false
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the incident
+      placeholder: "What happened?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: Incident severity level
+      options:
+        - P0 - Critical (Outage/Data Exposure)
+        - P1 - High (Major Degradation)
+        - P2 - Medium (Partial Loss)
+        - P3 - Low (Minor Issue)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      description: Current incident status
+      options:
+        - Detected - Issue identified
+        - Triaging - Assessing impact
+        - Investigating - Finding root cause
+        - Mitigating - Applying fix
+        - Monitoring - Verifying resolution
+        - Resolved - Issue fixed
+        - Postmortem - Review in progress
+    validations:
+      required: true
+
+  - type: input
+    id: detection_time
+    attributes:
+      label: Detection Time
+      description: When was the incident detected?
+      placeholder: "2026-01-08T12:00:00Z"
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: What is the impact of this incident?
+      placeholder: |
+        - Users affected:
+        - Services affected:
+        - Revenue impact:
+        - SLO impact:
+    validations:
+      required: true
+
+  - type: textarea
+    id: symptoms
+    attributes:
+      label: Symptoms
+      description: What symptoms are being observed?
+      placeholder: |
+        - Error messages:
+        - Affected endpoints:
+        - Error rates:
+        - User reports:
+    validations:
+      required: true
+
+  - type: textarea
+    id: timeline
+    attributes:
+      label: Timeline
+      description: Incident timeline (updated as incident progresses)
+      placeholder: |
+        - 12:00 - Incident detected via alert
+        - 12:05 - IC assigned, channel created
+        - 12:10 - Root cause identified
+        - 12:15 - Mitigation applied
+        - 12:30 - Incident resolved
+    validations:
+      required: false
+
+  - type: textarea
+    id: root_cause
+    attributes:
+      label: Root Cause
+      description: What caused the incident? (filled during/after investigation)
+      placeholder: "Describe the root cause"
+    validations:
+      required: false
+
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation Actions
+      description: What actions were taken to mitigate?
+      placeholder: |
+        - [ ] Action 1
+        - [ ] Action 2
+        - [ ] Action 3
+    validations:
+      required: false
+
+  - type: input
+    id: incident_commander
+    attributes:
+      label: Incident Commander
+      description: Who is the IC for this incident?
+      placeholder: "@username"
+    validations:
+      required: false
+
+  - type: input
+    id: incident_channel
+    attributes:
+      label: Incident Channel
+      description: Link to incident Slack channel
+      placeholder: "#inc-YYYYMMDD-description"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: incident_type
+    attributes:
+      label: Incident Type
+      description: Category of incident
+      options:
+        - Infrastructure - Hardware/cloud issues
+        - Application - Software bugs
+        - Security - Security-related
+        - Performance - Performance degradation
+        - Data - Data corruption/loss
+        - Operator Mode - Itqahn automation failure
+        - Kill Switch - Emergency stop activated
+        - GitHub Automation - CI/CD failure
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: affected_systems
+    attributes:
+      label: Affected Systems
+      description: Check all affected systems
+      options:
+        - label: Production environment
+        - label: Staging environment
+        - label: CI/CD pipeline
+        - label: Operator Mode workflows
+        - label: GitHub automation
+        - label: Database
+        - label: API services
+        - label: Frontend/UI
+        - label: Authentication
+        - label: Payments
+
+  - type: checkboxes
+    id: kill_switch
+    attributes:
+      label: Kill Switch
+      description: Kill switch status
+      options:
+        - label: Kill switch activated
+        - label: Kill switch released
+        - label: Credential rotation required
+        - label: Security review required
+
+  - type: textarea
+    id: action_items
+    attributes:
+      label: Action Items
+      description: Follow-up action items (populated during/after incident)
+      placeholder: |
+        - [ ] Short-term fix
+        - [ ] Long-term fix
+        - [ ] Documentation update
+        - [ ] Monitoring improvement
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: postmortem_required
+    attributes:
+      label: Postmortem
+      description: Postmortem requirements
+      options:
+        - label: Postmortem required (P0/P1 or >20% error budget)
+        - label: Postmortem scheduled
+        - label: Postmortem completed
+
+  - type: checkboxes
+    id: operator_mode
+    attributes:
+      label: Operator Mode
+      description: Automation options
+      options:
+        - label: Enable auto-escalation based on severity
+          required: false
+        - label: Create postmortem issue automatically
+          required: false
+        - label: Link related run failures
+          required: false

@@ -1,0 +1,31 @@
+{
+  "action": "merge.request",
+  "actor": {
+    "role": "frontend-builder",
+    "spiffe_id": "spiffe://itqahn/agent/frontend-builder"
+  },
+  "resource": {
+    "repo": "example",
+    "path": "apps/web/pages/checkout.tsx",
+    "capability": "repo.write_branch"
+  },
+  "context": {
+    "workflow_id": "wf_123",
+    "risk_tier": "sensitive",
+    "compliance_tier": "tier1",
+    "ui_change": true
+  },
+  "findings": {
+    "design_jail": {
+      "violations": 0
+    },
+    "secrets": []
+  },
+  "evidence": {
+    "human_approval": {
+      "present": false
+    },
+    "pack_id": "",
+    "signature_hash": ""
+  }
+}

@@ -1,0 +1,231 @@
+# Compliance Control Mapping
+# Maps Itqahn controls to industry frameworks
+
+apiVersion: itqahn.io/v1
+kind: ComplianceMapping
+metadata:
+  name: control-mapping
+  version: 2.0.0
+
+spec:
+  description: "Maps Itqahn security controls to compliance frameworks"
+
+  frameworks:
+    - id: soc2
+      name: SOC 2 Type II
+      version: "2017"
+
+    - id: iso27001
+      name: ISO 27001
+      version: "2022"
+
+    - id: nist800-53
+      name: NIST 800-53
+      version: "Rev 5"
+
+    - id: gdpr
+      name: GDPR
+      version: "2018"
+
+  controls:
+    # Access Control
+    - id: ITQ-AC-001
+      name: "Workload Identity"
+      description: "All services authenticate using SPIFFE workload identity"
+      implementation: SPIFFE/SPIRE
+      evidence:
+        - spiffe_id_logs
+        - certificate_issuance_records
+      mappings:
+        soc2: [CC6.1, CC6.2]
+        iso27001: [A.9.1.1, A.9.2.1]
+        nist800-53: [AC-2, AC-3, IA-2]
+
+    - id: ITQ-AC-002
+      name: "Role-Based Access Control"
+      description: "Agent permissions enforced via MCP allowlists and OPA policies"
+      implementation: OPA + MCP
+      evidence:
+        - policy_evaluation_logs
+        - access_decision_logs
+      mappings:
+        soc2: [CC6.1, CC6.3]
+        iso27001: [A.9.1.2, A.9.2.3]
+        nist800-53: [AC-2, AC-3, AC-6]
+
+    - id: ITQ-AC-003
+      name: "Least Privilege"
+      description: "Agents operate with minimum required permissions"
+      implementation: Agent Contract + MCP Allowlists
+      evidence:
+        - permission_audit_logs
+        - role_assignment_records
+      mappings:
+        soc2: [CC6.3]
+        iso27001: [A.9.2.3]
+        nist800-53: [AC-6]
+
+    # Secrets Management
+    - id: ITQ-SM-001
+      name: "Dynamic Secrets"
+      description: "Credentials issued dynamically with short TTL"
+      implementation: HashiCorp Vault
+      evidence:
+        - vault_audit_logs
+        - credential_issuance_records
+      mappings:
+        soc2: [CC6.1, CC6.7]
+        iso27001: [A.9.4.3]
+        nist800-53: [IA-5, SC-12]
+
+    - id: ITQ-SM-002
+      name: "Secret Rotation"
+      description: "Automated credential rotation"
+      implementation: Vault + Automation
+      evidence:
+        - rotation_logs
+        - secret_lifecycle_records
+      mappings:
+        soc2: [CC6.7]
+        iso27001: [A.9.4.3]
+        nist800-53: [IA-5]
+
+    # Supply Chain Security
+    - id: ITQ-SC-001
+      name: "SBOM Generation"
+      description: "Software bill of materials for all artifacts"
+      implementation: Syft + CycloneDX
+      evidence:
+        - sbom_artifacts
+        - evidence_pack_manifests
+      mappings:
+        soc2: [CC7.1]
+        iso27001: [A.14.2.7]
+        nist800-53: [SA-12, SR-4]
+
+    - id: ITQ-SC-002
+      name: "Provenance Signing"
+      description: "Cryptographic signing of build artifacts"
+      implementation: Sigstore/Cosign
+      evidence:
+        - signed_provenance
+        - signature_verification_logs
+      mappings:
+        soc2: [CC7.1, CC7.2]
+        iso27001: [A.14.2.7]
+        nist800-53: [SA-12, SI-7]
+
+    - id: ITQ-SC-003
+      name: "Vulnerability Scanning"
+      description: "Automated vulnerability detection"
+      implementation: Trivy + Semgrep
+      evidence:
+        - scan_results
+        - remediation_records
+      mappings:
+        soc2: [CC7.1]
+        iso27001: [A.12.6.1]
+        nist800-53: [RA-5, SI-2]
+
+    # Change Management
+    - id: ITQ-CM-001
+      name: "GitOps Deployment"
+      description: "All changes via version-controlled GitOps"
+      implementation: ArgoCD + Git
+      evidence:
+        - git_commit_logs
+        - deployment_records
+      mappings:
+        soc2: [CC8.1]
+        iso27001: [A.12.1.2, A.14.2.2]
+        nist800-53: [CM-2, CM-3]
+
+    - id: ITQ-CM-002
+      name: "Evidence-Gated Deployment"
+      description: "Deployments require complete Evidence Pack"
+      implementation: Admission Controller + OPA
+      evidence:
+        - evidence_pack_manifests
+        - deployment_gate_logs
+      mappings:
+        soc2: [CC8.1]
+        iso27001: [A.14.2.9]
+        nist800-53: [CM-3, CM-4]
+
+    # Audit Logging
+    - id: ITQ-AU-001
+      name: "Comprehensive Audit Logging"
+      description: "All agent actions and system events logged"
+      implementation: Structured logging + SIEM
+      evidence:
+        - audit_logs
+        - log_retention_proof
+      mappings:
+        soc2: [CC7.2, CC7.3]
+        iso27001: [A.12.4.1, A.12.4.3]
+        nist800-53: [AU-2, AU-3, AU-6]
+
+    - id: ITQ-AU-002
+      name: "Immutable Audit Trail"
+      description: "Audit logs are tamper-evident"
+      implementation: Append-only storage
+      evidence:
+        - log_integrity_proofs
+        - storage_configuration
+      mappings:
+        soc2: [CC7.2]
+        iso27001: [A.12.4.2]
+        nist800-53: [AU-9]
+
+    # Data Protection
+    - id: ITQ-DP-001
+      name: "Data Classification"
+      description: "Data classified and handled per classification"
+      implementation: Classification policy + controls
+      evidence:
+        - classification_records
+        - handling_logs
+      mappings:
+        soc2: [CC6.5]
+        iso27001: [A.8.2.1]
+        nist800-53: [RA-2, SC-16]
+        gdpr: [Art. 5, Art. 32]
+
+    - id: ITQ-DP-002
+      name: "Encryption at Rest"
+      description: "Sensitive data encrypted at rest"
+      implementation: Vault Transit + Cloud KMS
+      evidence:
+        - encryption_configuration
+        - key_management_logs
+      mappings:
+        soc2: [CC6.7]
+        iso27001: [A.10.1.1]
+        nist800-53: [SC-28]
+        gdpr: [Art. 32]
+
+    - id: ITQ-DP-003
+      name: "Encryption in Transit"
+      description: "All data encrypted in transit via TLS 1.2+"
+      implementation: mTLS + TLS 1.3
+      evidence:
+        - tls_configuration
+        - certificate_records
+      mappings:
+        soc2: [CC6.7]
+        iso27001: [A.10.1.1, A.13.1.1]
+        nist800-53: [SC-8, SC-13]
+        gdpr: [Art. 32]
+
+    # Incident Response
+    - id: ITQ-IR-001
+      name: "Incident Response Process"
+      description: "Documented incident response procedures"
+      implementation: Runbooks + Automation
+      evidence:
+        - incident_records
+        - postmortem_reports
+      mappings:
+        soc2: [CC7.3, CC7.4, CC7.5]
+        iso27001: [A.16.1.1, A.16.1.5]
+        nist800-53: [IR-1, IR-4, IR-6]

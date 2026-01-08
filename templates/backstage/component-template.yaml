@@ -1,0 +1,181 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: itqahn-ui-component
+  title: Itqahn UI Component
+  description: Create a new Design Jail-compliant UI component
+  tags:
+    - frontend
+    - component
+    - design-system
+    - itqahn
+spec:
+  owner: design-team
+  type: component
+
+  parameters:
+    - title: Component Information
+      required:
+        - name
+        - description
+        - owner
+      properties:
+        name:
+          title: Component Name
+          type: string
+          description: PascalCase name for your component (e.g., ButtonGroup)
+          pattern: "^[A-Z][a-zA-Z0-9]*$"
+          ui:autofocus: true
+
+        description:
+          title: Description
+          type: string
+          description: Brief description of this component's purpose
+
+        owner:
+          title: Owner
+          type: string
+          description: Team that owns this component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+
+    - title: Component Configuration
+      required:
+        - category
+        - complexity
+      properties:
+        category:
+          title: Category
+          type: string
+          enum:
+            - primitive
+            - composite
+            - layout
+            - form
+            - feedback
+            - navigation
+          description: Component category in the design system
+
+        complexity:
+          title: Complexity
+          type: string
+          enum:
+            - simple
+            - moderate
+            - complex
+          default: simple
+
+        hasVariants:
+          title: Has Variants
+          type: boolean
+          default: true
+          description: Component has multiple visual variants
+
+        isInteractive:
+          title: Is Interactive
+          type: boolean
+          default: false
+          description: Component responds to user interaction
+
+        requiresA11yReview:
+          title: Requires Accessibility Review
+          type: boolean
+          default: true
+
+    - title: Design Tokens
+      properties:
+        tokenCategories:
+          title: Token Categories Used
+          type: array
+          items:
+            type: string
+            enum:
+              - color.brand
+              - color.neutral
+              - color.semantic
+              - spacing
+              - radius
+              - typography
+              - shadow
+          uniqueItems: true
+          ui:widget: checkboxes
+
+    - title: Repository
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch Component Template
+      action: fetch:template
+      input:
+        url: ./skeleton-component
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          category: ${{ parameters.category }}
+          complexity: ${{ parameters.complexity }}
+          hasVariants: ${{ parameters.hasVariants }}
+          isInteractive: ${{ parameters.isInteractive }}
+          tokenCategories: ${{ parameters.tokenCategories }}
+
+    - id: generate-storybook
+      name: Generate Storybook Stories
+      action: fetch:template
+      input:
+        url: ./storybook-template
+        targetPath: ./stories
+        values:
+          name: ${{ parameters.name }}
+          hasVariants: ${{ parameters.hasVariants }}
+          isInteractive: ${{ parameters.isInteractive }}
+
+    - id: generate-tests
+      name: Generate Test Files
+      action: fetch:template
+      input:
+        url: ./test-template
+        targetPath: ./tests
+        values:
+          name: ${{ parameters.name }}
+          requiresA11yReview: ${{ parameters.requiresA11yReview }}
+
+    - id: publish
+      name: Publish to Repository
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        branchName: feat/add-${{ parameters.name | lower }}
+        title: "Add ${{ parameters.name }} component"
+        description: |
+          ## New Component: ${{ parameters.name }}
+
+          ${{ parameters.description }}
+
+          ### Details
+          - Category: ${{ parameters.category }}
+          - Complexity: ${{ parameters.complexity }}
+          - Variants: ${{ parameters.hasVariants }}
+          - Interactive: ${{ parameters.isInteractive }}
+
+          ### Checklist
+          - [ ] Design Jail validation passes
+          - [ ] Storybook stories complete
+          - [ ] Unit tests pass
+          - [ ] Accessibility audit complete
+
+  output:
+    links:
+      - title: Pull Request
+        url: ${{ steps['publish'].output.remoteUrl }}

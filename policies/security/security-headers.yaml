@@ -1,0 +1,62 @@
+# Security Headers Policy
+# Defines required HTTP security headers for all services
+
+apiVersion: itqahn.io/v1
+kind: SecurityPolicy
+metadata:
+  name: security-headers
+  version: 2.0.0
+
+spec:
+  description: "Required HTTP security headers for all services"
+  enforcement: required
+  scope: all_services
+
+  headers:
+    # Prevent MIME type sniffing
+    - name: X-Content-Type-Options
+      value: "nosniff"
+      required: true
+
+    # Prevent clickjacking
+    - name: X-Frame-Options
+      value: "DENY"
+      required: true
+      exceptions:
+        - condition: "service.type == 'embed'"
+          value: "SAMEORIGIN"
+
+    # XSS protection (legacy browsers)
+    - name: X-XSS-Protection
+      value: "1; mode=block"
+      required: true
+
+    # Strict transport security
+    - name: Strict-Transport-Security
+      value: "max-age=31536000; includeSubDomains"
+      required: true
+      min_max_age: 31536000
+
+    # Referrer policy
+    - name: Referrer-Policy
+      value: "strict-origin-when-cross-origin"
+      required: true
+
+    # Permissions policy
+    - name: Permissions-Policy
+      value: "camera=(), microphone=(), geolocation=()"
+      required: false
+      recommended: true
+
+  # Headers that must NOT be present
+  forbidden_headers:
+    - name: X-Powered-By
+      reason: "Information disclosure"
+    - name: Server
+      reason: "Information disclosure (should be stripped or generic)"
+
+  # Validation
+  validation:
+    method: response_scan
+    frequency: continuous
+    alert_on_violation: true

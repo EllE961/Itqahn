@@ -1,0 +1,10 @@
+# CODEOWNERS (Template)
+# Adjust paths to your repo layout.
+
+# Security-sensitive paths
+/auth/ @security-team
+/policies/ @security-team @platform-team
+/infra/ @platform-team @sre-team
+
+# UI design system
+/design-system/ @design-team

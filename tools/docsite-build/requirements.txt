@@ -1,0 +1,14 @@
+# MkDocs and plugins
+mkdocs>=1.5.0
+mkdocs-material>=9.0.0
+mkdocs-mermaid2-plugin>=1.0.0
+
+# Extensions
+pymdown-extensions>=10.0
+pygments>=2.15.0
+
+# Validation
+linkchecker>=10.0.0
+
+# Versioning
+mike>=1.1.0

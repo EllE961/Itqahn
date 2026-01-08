@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: itqahn-require-ttl-label
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-ttl
+      match:
+        resources:
+          kinds:
+            - Namespace
+      validate:
+        message: "Ephemeral namespaces must have itqahn.io/ttl-hours label."
+        pattern:
+          metadata:
+            labels:
+              itqahn.io/ttl-hours: "?*"

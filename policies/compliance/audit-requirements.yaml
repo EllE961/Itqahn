@@ -1,0 +1,227 @@
+# Audit Requirements Policy
+# Defines audit logging and retention requirements
+
+apiVersion: itqahn.io/v1
+kind: CompliancePolicy
+metadata:
+  name: audit-requirements
+  version: 2.0.0
+
+spec:
+  description: "Audit logging requirements for compliance"
+  enforcement: required
+
+  # Required Audit Events
+  events:
+    authentication:
+      required: true
+      events:
+        - login_success
+        - login_failure
+        - logout
+        - session_timeout
+        - mfa_challenge
+        - mfa_success
+        - mfa_failure
+        - password_change
+        - password_reset
+      fields:
+        - timestamp
+        - user_id
+        - ip_address
+        - user_agent
+        - result
+        - failure_reason
+
+    authorization:
+      required: true
+      events:
+        - access_granted
+        - access_denied
+        - permission_change
+        - role_assignment
+        - role_removal
+      fields:
+        - timestamp
+        - subject_id
+        - resource
+        - action
+        - decision
+        - policy_id
+
+    agent_actions:
+      required: true
+      events:
+        - agent_started
+        - agent_completed
+        - agent_failed
+        - tool_invoked
+        - artifact_created
+        - escalation_triggered
+      fields:
+        - timestamp
+        - agent_id
+        - workflow_id
+        - tenant_id
+        - action
+        - result
+        - duration_ms
+
+    mcp_operations:
+      required: true
+      events:
+        - mcp_request
+        - mcp_response
+        - mcp_error
+      fields:
+        - timestamp
+        - agent_id
+        - mcp_type
+        - operation
+        - resource
+        - result
+        - latency_ms
+
+    data_access:
+      required: true
+      events:
+        - data_read
+        - data_write
+        - data_delete
+        - data_export
+      fields:
+        - timestamp
+        - user_id
+        - data_classification
+        - resource
+        - action
+        - justification
+
+    system_events:
+      required: true
+      events:
+        - deployment
+        - rollback
+        - configuration_change
+        - policy_update
+        - certificate_issued
+        - secret_accessed
+      fields:
+        - timestamp
+        - actor
+        - action
+        - resource
+        - change_details
+
+  # Log Format
+  format:
+    type: json
+    schema:
+      type: object
+      required:
+        - timestamp
+        - event_type
+        - actor
+        - action
+        - result
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+        actor:
+          type: object
+          properties:
+            type:
+              enum: [user, agent, service, system]
+            id:
+              type: string
+        action:
+          type: string
+        resource:
+          type: string
+        result:
+          enum: [success, failure, denied]
+        metadata:
+          type: object
+
+  # Retention Requirements
+  retention:
+    default:
+      duration_days: 365
+      storage: encrypted
+
+    by_tier:
+      baseline:
+        duration_days: 365
+
+      sensitive:
+        duration_days: 730
+
+      regulated:
+        duration_days: 2555  # 7 years
+        immutable: true
+
+    by_event_type:
+      security_events:
+        duration_days: 730
+
+      financial_events:
+        duration_days: 2555
+
+  # Log Protection
+  protection:
+    encryption:
+      at_rest: required
+      algorithm: AES-256-GCM
+
+    integrity:
+      method: hash_chain
+      algorithm: SHA-256
+
+    access:
+      read: [security_team, compliance_team, audit_liaison]
+      modify: []  # No one can modify
+      delete: [compliance_team]  # Only after retention period
+
+  # Log Aggregation
+  aggregation:
+    required: true
+    destinations:
+      - type: SIEM
+        retention_days: 90
+        real_time: true
+
+      - type: long_term_storage
+        retention_days: 2555
+        encrypted: true
+
+  # Alerting
+  alerting:
+    required_alerts:
+      - name: authentication_failures
+        condition: "count(login_failure) > 5 in 5m"
+        severity: warning
+
+      - name: unauthorized_access_attempts
+        condition: "access_denied.count > 10 in 1h"
+        severity: critical
+
+      - name: sensitive_data_access
+        condition: "data_access.classification == 'confidential'"
+        severity: info
+
+      - name: policy_violations
+        condition: "policy_violation.count > 0"
+        severity: critical
+
+  # Validation
+  validation:
+    log_completeness:
+      check_frequency: hourly
+      alert_on_gap: true
+
+    log_integrity:
+      verify_frequency: daily
+      alert_on_tampering: true

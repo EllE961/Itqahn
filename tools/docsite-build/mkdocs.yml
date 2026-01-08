@@ -1,0 +1,161 @@
+site_name: Itqahn Documentation
+site_description: Autonomous Company-as-Software Platform
+site_url: https://docs.itqahn.io
+site_author: Itqahn Team
+
+repo_name: itqahn/documentation
+repo_url: https://github.com/itqahn/documentation
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Overview:
+    - 00-overview/index.md
+    - Glossary: 00-overview/glossary.md
+    - Principles: 00-overview/principles.md
+
+  - Product:
+    - Vision: 01-product/product-vision.md
+    - Build Types: 01-product/supported-build-types.md
+    - Phase Gates: 01-product/lifecycle-phase-gates.md
+    - Requirements: 01-product/requirements-schema.md
+    - ADR Policy: 01-product/adr-policy.md
+
+  - Architecture:
+    - Reference: 02-architecture/reference-architecture.md
+    - Workflows: 02-architecture/workflow-architecture.md
+    - Memory: 02-architecture/memory-architecture.md
+    - Tenancy: 02-architecture/tenancy-isolation.md
+    - Data Classification: 02-architecture/data-classification.md
+
+  - Platform:
+    - Portal: 03-platform/portal-webapp.md
+    - Backstage: 03-platform/backstage.md
+    - CI/CD: 03-platform/ci-cd-gitops.md
+    - Design System: 03-platform/design-system-design-jail.md
+
+  - Security:
+    - Security Model: 04-security/security-model.md
+    - Identity (SPIFFE): 04-security/identity-spiffe.md
+    - Secrets (Vault): 04-security/secrets-vault.md
+    - Secure SDLC: 04-security/secure-sdlc-ssdf.md
+    - AppSec (ASVS): 04-security/appsec-asvs.md
+    - Prompt Injection: 04-security/prompt-injection-defense.md
+    - Red Team: 04-security/red-team-program.md
+
+  - Compliance:
+    - Compliance Tiers: 05-compliance/compliance-tiers.md
+    - Evidence Pack: 05-compliance/evidence-pack.md
+    - SLSA Provenance: 05-compliance/slsa-provenance.md
+    - SBOM & VEX: 05-compliance/sbom-vex.md
+    - Audit Ready: 05-compliance/audit-ready-operations.md
+
+  - Operations:
+    - SRE Model: 06-operations/sre-model.md
+    - Incident Response: 06-operations/incident-response.md
+    - Runbooks: 06-operations/runbooks.md
+    - Auto-Remediation: 06-operations/auto-remediation.md
+    - FinOps: 06-operations/finops-token-budgets.md
+
+  - Integrations:
+    - Git: 07-integrations/git-integration.md
+    - Webhooks: 07-integrations/webhooks-events.md
+    - MCP:
+      - Overview: 07-integrations/mcp/mcp-overview.md
+      - Security: 07-integrations/mcp/mcp-security-model.md
+      - Allowlists: 07-integrations/mcp/mcp-allowlists.md
+      - Figma: 07-integrations/mcp/mcp-figma.md
+      - GitHub: 07-integrations/mcp/mcp-github.md
+      - Jira: 07-integrations/mcp/mcp-jira.md
+      - Kubernetes: 07-integrations/mcp/mcp-kubernetes.md
+      - Vault: 07-integrations/mcp/mcp-vault.md
+      - Observability: 07-integrations/mcp/mcp-observability.md
+
+  - Agents:
+    - System Contract: 08-agents/agent-system-contract.md
+    - Permissions: 08-agents/agent-permissions.md
+    - Quality Bar: 08-agents/agent-quality-bar.md
+    - Catalog: 08-agents/agent-catalog.md
+
+  - Appendix:
+    - Decision Log: 99-appendix/decision-log.md
+    - Templates Index: 99-appendix/templates-index.md
+    - Reference Links: 99-appendix/reference-links.md
+
+plugins:
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/itqahn
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+
+copyright: Copyright &copy; 2026 Itqahn

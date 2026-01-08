@@ -1,0 +1,177 @@
+name: Itqahn Work Item
+description: Create an Itqahn Work Item for implementation
+title: "[Work Item] "
+labels: ["work-item", "itqahn"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Itqahn Work Item Template
+        Use this template to create a Work Item that will be implemented by Itqahn Operator Mode.
+        Work Items are linked to parent Epics and result in Pull Requests.
+
+  - type: input
+    id: work_item_id
+    attributes:
+      label: Work Item ID
+      description: Unique identifier for this work item (auto-generated if blank)
+      placeholder: "wi-"
+    validations:
+      required: false
+
+  - type: input
+    id: parent_epic
+    attributes:
+      label: Parent Epic
+      description: Link to parent epic issue
+      placeholder: "#123"
+    validations:
+      required: false
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the work item
+      placeholder: "What needs to be implemented?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Detailed description of the work to be done
+      placeholder: "Provide implementation details, context, and requirements"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What defines "done" for this work item?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_requirements
+    attributes:
+      label: Technical Requirements
+      description: Specific technical requirements or constraints
+      placeholder: |
+        - Must use TypeScript
+        - Follow existing patterns in src/components
+        - Include unit tests with >80% coverage
+    validations:
+      required: false
+
+  - type: textarea
+    id: files_to_modify
+    attributes:
+      label: Files to Modify
+      description: List of files that will likely be modified (helps Itqahn plan)
+      placeholder: |
+        - src/components/Feature.tsx
+        - src/services/api.ts
+        - tests/feature.test.ts
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Priority level for this work item
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity
+      description: Estimated complexity
+      options:
+        - XS - Trivial (< 1 hour)
+        - S - Small (1-4 hours)
+        - M - Medium (1-2 days)
+        - L - Large (3-5 days)
+        - XL - Very Large (> 5 days)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compliance_tier
+    attributes:
+      label: Compliance Tier
+      description: Data sensitivity tier for this work item
+      options:
+        - T1 - Public
+        - T2 - Internal
+        - T3 - Customer Data
+        - T4 - Regulated
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies or blockers
+      placeholder: |
+        - Depends on #123
+        - Requires API endpoint from backend team
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: risk_flags
+    attributes:
+      label: Risk Flags
+      description: Check all that apply
+      options:
+        - label: Touches auth/authz
+        - label: Destructive migration
+        - label: Payments/billing
+        - label: Regulated data (PII/PHI)
+        - label: UI change (Design Jail applies)
+        - label: Infrastructure change
+        - label: Security-sensitive
+
+  - type: checkboxes
+    id: testing_requirements
+    attributes:
+      label: Testing Requirements
+      description: Required testing for this work item
+      options:
+        - label: Unit tests
+        - label: Integration tests
+        - label: Contract tests
+        - label: E2E tests
+        - label: Visual regression tests
+        - label: Performance tests
+        - label: Security tests
+
+  - type: checkboxes
+    id: operator_mode
+    attributes:
+      label: Operator Mode
+      description: Enable automated processing
+      options:
+        - label: Enable Operator Mode processing for this work item
+          required: false
+        - label: Auto-create branch on assignment
+          required: false
+        - label: Auto-create PR when complete
+          required: false
+        - label: Enable auto-merge when checks pass
+          required: false

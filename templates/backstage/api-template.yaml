@@ -1,0 +1,157 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: itqahn-api
+  title: Itqahn API Service
+  description: Create a new Itqahn-compliant API service with OpenAPI spec
+  tags:
+    - api
+    - openapi
+    - itqahn
+spec:
+  owner: platform-team
+  type: api
+
+  parameters:
+    - title: API Information
+      required:
+        - name
+        - description
+        - owner
+      properties:
+        name:
+          title: API Name
+          type: string
+          description: Unique name for your API (lowercase, hyphens allowed)
+          pattern: "^[a-z][a-z0-9-]*$"
+          ui:autofocus: true
+
+        description:
+          title: Description
+          type: string
+          description: Brief description of what this API does
+
+        owner:
+          title: Owner
+          type: string
+          description: Team that owns this API
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+
+        apiVersion:
+          title: API Version
+          type: string
+          default: v1
+          pattern: "^v[0-9]+$"
+
+    - title: Technical Configuration
+      required:
+        - language
+        - complianceTier
+      properties:
+        language:
+          title: Implementation Language
+          type: string
+          enum:
+            - typescript
+            - python
+            - go
+          default: typescript
+
+        complianceTier:
+          title: Compliance Tier
+          type: string
+          enum:
+            - baseline
+            - sensitive
+            - regulated
+          default: sensitive
+          description: APIs are typically at least sensitive tier
+
+        authMethod:
+          title: Authentication Method
+          type: string
+          enum:
+            - bearer_jwt
+            - api_key
+            - oauth2
+          default: bearer_jwt
+
+        rateLimit:
+          title: Rate Limit (requests/minute)
+          type: integer
+          default: 100
+          minimum: 10
+          maximum: 10000
+
+    - title: Repository
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base Template
+      action: fetch:template
+      input:
+        url: ./skeleton-api
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          apiVersion: ${{ parameters.apiVersion }}
+          language: ${{ parameters.language }}
+          complianceTier: ${{ parameters.complianceTier }}
+          authMethod: ${{ parameters.authMethod }}
+          rateLimit: ${{ parameters.rateLimit }}
+
+    - id: generate-openapi
+      name: Generate OpenAPI Spec
+      action: fetch:template
+      input:
+        url: ./openapi-template
+        targetPath: ./specs
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          apiVersion: ${{ parameters.apiVersion }}
+          authMethod: ${{ parameters.authMethod }}
+
+    - id: publish
+      name: Publish Repository
+      action: publish:github
+      input:
+        allowedHosts:
+          - github.com
+        repoUrl: ${{ parameters.repoUrl }}
+        description: ${{ parameters.description }}
+        defaultBranch: main
+        protectDefaultBranch: true
+        requireCodeOwnerReviews: true
+
+    - id: register
+      name: Register in Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+      - title: API Docs
+        icon: docs
+        url: ${{ steps['publish'].output.remoteUrl }}/blob/main/specs/openapi.yaml

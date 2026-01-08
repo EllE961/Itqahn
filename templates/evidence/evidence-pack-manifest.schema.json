@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Itqahn Evidence Pack Manifest",
+  "description": "Schema for Evidence Pack manifest files",
+  "type": "object",
+  "required": [
+    "pack_id",
+    "service",
+    "version",
+    "git_commit",
+    "build_id",
+    "created_at",
+    "compliance_tier",
+    "artifacts",
+    "signature_hash"
+  ],
+  "properties": {
+    "pack_id": {
+      "type": "string",
+      "description": "Unique identifier for this evidence pack",
+      "pattern": "^ep-[a-z0-9-]+-v[0-9]+\\.[0-9]+\\.[0-9]+-[a-f0-9]+$"
+    },
+    "service": {
+      "type": "string",
+      "description": "Service name"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?$"
+    },
+    "git_commit": {
+      "type": "string",
+      "description": "Full git commit SHA",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "build_id": {
+      "type": "string",
+      "description": "CI/CD build identifier"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "compliance_tier": {
+      "type": "string",
+      "enum": ["baseline", "sensitive", "regulated"],
+      "description": "Compliance tier classification"
+    },
+    "workflow_id": {
+      "type": "string",
+      "description": "Associated Itqahn workflow ID"
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["sbom", "provenance", "scans", "tests"],
+      "properties": {
+        "sbom": {
+          "type": "object",
+          "required": ["present", "path", "format"],
+          "properties": {
+            "present": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string"
+            },
+            "format": {
+              "type": "string",
+              "enum": ["CycloneDX", "SPDX"]
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "required": ["present", "path", "format"],
+          "properties": {
+            "present": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string"
+            },
+            "format": {
+              "type": "string",
+              "enum": ["in-toto", "SLSA"]
+            },
+            "signed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "scans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "tool", "path"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["sast", "sca", "secrets", "container", "dast"]
+              },
+              "tool": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "findings": {
+                "type": "object",
+                "properties": {
+                  "critical": {"type": "integer"},
+                  "high": {"type": "integer"},
+                  "medium": {"type": "integer"},
+                  "low": {"type": "integer"}
+                }
+              }
+            }
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "path"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["unit", "integration", "e2e", "contract", "performance"]
+              },
+              "path": {
+                "type": "string"
+              },
+              "results": {
+                "type": "object",
+                "properties": {
+                  "total": {"type": "integer"},
+                  "passed": {"type": "integer"},
+                  "failed": {"type": "integer"},
+                  "skipped": {"type": "integer"}
+                }
+              }
+            }
+          }
+        },
+        "approvals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "path"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["code_review", "security_review", "compliance_review", "change_advisory"]
+              },
+              "path": {
+                "type": "string"
+              },
+              "approver": {
+                "type": "string"
+              },
+              "approved_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "path": {"type": "string"},
+            "line_coverage": {"type": "number"},
+            "branch_coverage": {"type": "number"}
+          }
+        }
+      }
+    },
+    "signature_hash": {
+      "type": "string",
+      "description": "SHA256 hash of the signed manifest",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}

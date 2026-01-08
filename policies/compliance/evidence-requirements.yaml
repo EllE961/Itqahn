@@ -1,0 +1,220 @@
+# Evidence Requirements Policy
+# Defines required evidence artifacts per compliance tier
+
+apiVersion: itqahn.io/v1
+kind: CompliancePolicy
+metadata:
+  name: evidence-requirements
+  version: 2.0.0
+
+spec:
+  description: "Evidence collection requirements by compliance tier"
+  enforcement: required
+
+  # Tier Definitions
+  tiers:
+    baseline:
+      description: "Standard compliance for internal tools"
+      risk_level: low
+
+    sensitive:
+      description: "Enhanced compliance for customer-facing services"
+      risk_level: medium
+
+    regulated:
+      description: "Full compliance for regulated workloads"
+      risk_level: high
+
+  # Evidence Requirements by Tier
+  requirements:
+    # Baseline Tier
+    baseline:
+      build_evidence:
+        required:
+          - sbom: true
+          - provenance: true
+          - unit_tests: true
+          - lint_results: true
+        optional:
+          - integration_tests: recommended
+          - sast_scan: recommended
+
+      security_evidence:
+        required:
+          - secret_scan: true
+          - dependency_scan: true
+        optional:
+          - sast: recommended
+          - dast: optional
+
+      approval_evidence:
+        required:
+          - ci_pass: true
+          - code_review: true
+        optional:
+          - security_review: optional
+
+      retention:
+        duration_days: 365
+
+    # Sensitive Tier
+    sensitive:
+      build_evidence:
+        required:
+          - sbom: true
+          - provenance: true
+          - unit_tests: true
+          - integration_tests: true
+          - lint_results: true
+          - type_check: true
+        optional:
+          - e2e_tests: recommended
+
+      security_evidence:
+        required:
+          - secret_scan: true
+          - dependency_scan: true
+          - sast_scan: true
+          - container_scan: true
+        optional:
+          - dast_scan: recommended
+
+      approval_evidence:
+        required:
+          - ci_pass: true
+          - code_review: true
+          - security_review: true
+        optional:
+          - architecture_review: conditional
+
+      deployment_evidence:
+        required:
+          - canary_metrics: true
+          - rollback_plan: true
+
+      retention:
+        duration_days: 730
+
+    # Regulated Tier
+    regulated:
+      build_evidence:
+        required:
+          - sbom: true
+          - provenance: true
+          - signed_provenance: true
+          - unit_tests: true
+          - integration_tests: true
+          - e2e_tests: true
+          - lint_results: true
+          - type_check: true
+          - coverage_report: true
+        coverage_threshold: 80
+
+      security_evidence:
+        required:
+          - secret_scan: true
+          - dependency_scan: true
+          - sast_scan: true
+          - dast_scan: true
+          - container_scan: true
+          - threat_model: true
+          - penetration_test: conditional
+        scan_thresholds:
+          critical: 0
+          high: 0
+          medium: review_required
+
+      approval_evidence:
+        required:
+          - ci_pass: true
+          - code_review: true
+          - security_review: true
+          - compliance_review: true
+          - change_advisory_board: conditional
+        approval_signatures: required
+
+      deployment_evidence:
+        required:
+          - canary_metrics: true
+          - slo_baseline: true
+          - rollback_plan: true
+          - rollback_tested: true
+
+      audit_evidence:
+        required:
+          - change_record: true
+          - approval_chain: true
+          - deployment_log: true
+
+      retention:
+        duration_days: 2555
+        immutable: true
+
+  # Evidence Pack Structure
+  evidence_pack:
+    manifest:
+      required_fields:
+        - version
+        - service
+        - build_id
+        - commit_sha
+        - timestamp
+        - tier
+        - artifacts
+
+    artifacts:
+      sbom:
+        format: CycloneDX
+        version: "1.5"
+        path: "sbom.json"
+
+      provenance:
+        format: in-toto
+        signed: conditional  # Required for regulated
+        path: "provenance.json"
+
+      scans:
+        path: "scans/"
+        contents:
+          - sast-results.json
+          - dependency-results.json
+          - secret-scan-results.json
+
+      tests:
+        path: "tests/"
+        contents:
+          - test-results.xml
+          - coverage-report.json
+
+      approvals:
+        path: "approvals/"
+        contents:
+          - code-review.json
+          - security-review.json
+
+    storage:
+      location: "s3://evidence/{service}/{version}/{build_id}/"
+      encryption: required
+      access_control: role_based
+
+  # Validation Rules
+  validation:
+    pre_deployment:
+      - check: evidence_pack_complete
+        block_on_failure: true
+
+      - check: scan_thresholds_met
+        block_on_failure: true
+
+      - check: approvals_present
+        block_on_failure: true
+
+      - check: provenance_valid
+        block_on_failure: true
+
+    post_deployment:
+      - check: evidence_archived
+        alert_on_failure: true
+
+      - check: audit_record_created
+        alert_on_failure: true

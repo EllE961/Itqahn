@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-01-06",
+  "components": [
+    {
+      "name": "Button",
+      "status": "stable",
+      "tokens": [
+        "color.brand.primary",
+        "radius.md",
+        "spacing.2"
+      ]
+    },
+    {
+      "name": "Input",
+      "status": "stable",
+      "tokens": [
+        "radius.md",
+        "spacing.2"
+      ]
+    },
+    {
+      "name": "Card",
+      "status": "stable",
+      "tokens": [
+        "radius.lg",
+        "spacing.4"
+      ]
+    }
+  ]
+}

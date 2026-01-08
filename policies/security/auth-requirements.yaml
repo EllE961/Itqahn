@@ -1,0 +1,131 @@
+# Authentication Requirements Policy
+# Defines authentication standards for all services
+
+apiVersion: itqahn.io/v1
+kind: SecurityPolicy
+metadata:
+  name: auth-requirements
+  version: 2.0.0
+
+spec:
+  description: "Authentication requirements for services and users"
+  enforcement: required
+  scope: all_services
+
+  # Service-to-Service Authentication
+  service_auth:
+    method: mTLS
+    identity_provider: SPIFFE
+    requirements:
+      - mtls_required: true
+      - certificate_validation: strict
+      - spiffe_id_validation: true
+
+    allowed_identity_formats:
+      - "spiffe://itqahn.io/agent/{agent-type}/{tenant-id}/{workflow-id}"
+      - "spiffe://itqahn.io/service/{service-name}/{environment}"
+
+  # User Authentication
+  user_auth:
+    methods:
+      primary:
+        - OIDC
+        - SAML
+      mfa_required: true
+
+    password_requirements:
+      min_length: 12
+      require_uppercase: true
+      require_lowercase: true
+      require_number: true
+      require_special: false
+      max_age_days: 90
+      history_count: 12
+
+    session:
+      max_idle_minutes: 30
+      max_duration_hours: 8
+      secure_cookie: true
+      same_site: strict
+
+    mfa:
+      required_for:
+        - production_access
+        - admin_operations
+        - sensitive_data
+      allowed_methods:
+        - TOTP
+        - WebAuthn
+        - Push notification
+      forbidden_methods:
+        - SMS
+
+  # API Authentication
+  api_auth:
+    methods:
+      - name: Bearer Token
+        format: JWT
+        validation:
+          issuer: required
+          audience: required
+          expiration: required
+          max_lifetime_hours: 1
+
+      - name: API Key
+        use_case: service_accounts
+        requirements:
+          - stored_hashed
+          - rotation_required
+          - max_age_days: 90
+
+    forbidden_methods:
+      - Basic Auth (over non-TLS)
+      - Query string tokens (for sensitive operations)
+
+  # Token Requirements
+  tokens:
+    jwt:
+      algorithm:
+        allowed: [RS256, RS384, RS512, ES256, ES384, ES512]
+        forbidden: [HS256, HS384, HS512, none]
+      claims:
+        required:
+          - iss
+          - sub
+          - aud
+          - exp
+          - iat
+        recommended:
+          - jti
+          - nbf
+
+    access_tokens:
+      max_lifetime_minutes: 15
+
+    refresh_tokens:
+      max_lifetime_days: 7
+      rotation: true
+      revocation: required
+
+  # Rate Limiting
+  rate_limiting:
+    authentication_attempts:
+      max_per_minute: 5
+      max_per_hour: 20
+      lockout_duration_minutes: 30
+
+  # Audit Requirements
+  audit:
+    log_events:
+      - authentication_success
+      - authentication_failure
+      - logout
+      - session_timeout
+      - mfa_challenge
+      - password_change
+      - api_key_usage
+
+  # Validation
+  validation:
+    scan_frequency: continuous
+    alert_on_violation: true

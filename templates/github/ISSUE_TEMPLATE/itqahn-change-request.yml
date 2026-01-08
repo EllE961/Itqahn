@@ -1,0 +1,173 @@
+name: Itqahn Change Request
+description: Request a change to existing functionality
+title: "[Change Request] "
+labels: ["change-request", "itqahn"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Itqahn Change Request Template
+        Use this template to request changes to existing functionality.
+        Change Requests go through approval workflows before implementation.
+
+  - type: input
+    id: change_request_id
+    attributes:
+      label: Change Request ID
+      description: Unique identifier (auto-generated if blank)
+      placeholder: "cr-"
+    validations:
+      required: false
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the requested change
+      placeholder: "What change is being requested?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: change_type
+    attributes:
+      label: Change Type
+      description: Type of change being requested
+      options:
+        - Enhancement - Improve existing functionality
+        - Refactor - Restructure without changing behavior
+        - Configuration - Update configuration/settings
+        - Dependency - Update dependencies
+        - Security - Security-related change
+        - Performance - Performance improvement
+        - Breaking - Breaking change (API/contract)
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current Behavior
+      description: Describe the current behavior
+      placeholder: "How does the system currently work?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_behavior
+    attributes:
+      label: Proposed Behavior
+      description: Describe the desired behavior after the change
+      placeholder: "How should the system work after this change?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Justification
+      description: Why is this change needed?
+      placeholder: "Explain the business or technical reason for this change"
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact_analysis
+    attributes:
+      label: Impact Analysis
+      description: What will be affected by this change?
+      placeholder: |
+        - Affected systems:
+        - Affected users:
+        - Affected APIs:
+        - Breaking changes:
+    validations:
+      required: true
+
+  - type: textarea
+    id: rollback_plan
+    attributes:
+      label: Rollback Plan
+      description: How can this change be rolled back if needed?
+      placeholder: "Describe the rollback procedure"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Priority level for this change
+      options:
+        - P0 - Critical (Emergency)
+        - P1 - High (Next sprint)
+        - P2 - Medium (Planned)
+        - P3 - Low (Backlog)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compliance_tier
+    attributes:
+      label: Compliance Tier
+      description: Data sensitivity tier affected by this change
+      options:
+        - T1 - Public
+        - T2 - Internal
+        - T3 - Customer Data
+        - T4 - Regulated
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: risk_flags
+    attributes:
+      label: Risk Flags
+      description: Check all that apply
+      options:
+        - label: Touches auth/authz
+        - label: Destructive migration
+        - label: Payments/billing
+        - label: Regulated data (PII/PHI)
+        - label: UI change (Design Jail applies)
+        - label: Infrastructure change
+        - label: Security-sensitive
+        - label: Breaking API change
+        - label: Database schema change
+        - label: Configuration change
+
+  - type: textarea
+    id: approvers
+    attributes:
+      label: Required Approvers
+      description: List required approvers for this change
+      placeholder: |
+        - @tech-lead - Technical approval
+        - @product-owner - Business approval
+        - @security-team - Security approval (if applicable)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: approval_status
+    attributes:
+      label: Approval Status
+      description: Track approval status (updated during review)
+      options:
+        - label: Technical approval obtained
+        - label: Business approval obtained
+        - label: Security approval obtained (if required)
+        - label: Change Advisory Board approval (T4 only)
+
+  - type: checkboxes
+    id: operator_mode
+    attributes:
+      label: Operator Mode
+      description: Enable automated processing
+      options:
+        - label: Enable Operator Mode processing for this change request
+          required: false
+        - label: Auto-create work items after approval
+          required: false
+        - label: Send for automated approval workflow
+          required: false

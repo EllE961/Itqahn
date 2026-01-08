@@ -1,0 +1,14 @@
+# MCP Allowlist (Example)
+
+roles:
+  frontend-builder:
+    - figma.read
+    - repo.read
+    - repo.write_branch
+    - issue.create
+    - obs.read
+  policy-author:
+    - repo.read
+    - repo.write_branch
+    - policy.write
+    - policy.test

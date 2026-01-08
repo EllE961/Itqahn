@@ -1,0 +1,95 @@
+# Content Security Policy
+# Defines CSP requirements for frontend applications
+
+apiVersion: itqahn.io/v1
+kind: SecurityPolicy
+metadata:
+  name: content-security-policy
+  version: 2.0.0
+
+spec:
+  description: "Content Security Policy requirements for web applications"
+  enforcement: required
+  scope: frontend_services
+
+  # Default CSP directives
+  directives:
+    default-src:
+      values: ["'self'"]
+      required: true
+
+    script-src:
+      values: ["'self'"]
+      required: true
+      # Nonces preferred over unsafe-inline
+      allow_nonce: true
+      forbidden:
+        - "'unsafe-inline'"
+        - "'unsafe-eval'"
+      exceptions:
+        - condition: "legacy_support == true"
+          allow: ["'unsafe-inline'"]
+          requires_approval: true
+
+    style-src:
+      values: ["'self'"]
+      required: true
+      # Allow inline styles only via nonces
+      allow_nonce: true
+
+    img-src:
+      values: ["'self'", "data:", "https:"]
+      required: true
+
+    font-src:
+      values: ["'self'"]
+      required: true
+
+    connect-src:
+      values: ["'self'"]
+      required: true
+      # Allow specific API endpoints
+      additional_allowed:
+        - "https://api.itqahn.io"
+        - "https://telemetry.itqahn.io"
+
+    frame-src:
+      values: ["'none'"]
+      required: true
+      exceptions:
+        - condition: "service.type == 'embed_host'"
+          allow: ["'self'"]
+
+    frame-ancestors:
+      values: ["'none'"]
+      required: true
+      exceptions:
+        - condition: "service.type == 'embeddable'"
+          allow: ["'self'", "https://*.trusted-domain.com"]
+
+    object-src:
+      values: ["'none'"]
+      required: true
+
+    base-uri:
+      values: ["'self'"]
+      required: true
+
+    form-action:
+      values: ["'self'"]
+      required: true
+
+    upgrade-insecure-requests:
+      enabled: true
+      required: true
+
+  # Report-only mode for testing
+  report_only:
+    enabled: false
+    report_uri: "https://csp-reports.itqahn.io/report"
+
+  # Validation
+  validation:
+    method: header_scan
+    frequency: continuous
+    alert_on_violation: true

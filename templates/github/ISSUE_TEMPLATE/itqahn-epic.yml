@@ -1,0 +1,158 @@
+name: Itqahn Epic
+description: Create an Itqahn Epic for a major feature or initiative
+title: "[Epic] "
+labels: ["epic", "itqahn"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Itqahn Epic Template
+        Use this template to create an Epic that will be processed by Itqahn Operator Mode.
+        Epics are broken down into Work Items for implementation.
+
+  - type: input
+    id: epic_id
+    attributes:
+      label: Epic ID
+      description: Unique identifier for this epic (auto-generated if blank)
+      placeholder: "epic-"
+    validations:
+      required: false
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the epic
+      placeholder: "What is this epic about?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: Problem Statement
+      description: What problem does this epic solve?
+      placeholder: "Describe the problem or opportunity this epic addresses"
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals
+      description: What are the goals of this epic?
+      placeholder: |
+        - Goal 1
+        - Goal 2
+        - Goal 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What defines success for this epic?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: work_items
+    attributes:
+      label: Work Items
+      description: List the work items to be created (Itqahn will create these as linked issues)
+      placeholder: |
+        1. Work Item 1 - Description
+        2. Work Item 2 - Description
+        3. Work Item 3 - Description
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Priority level for this epic
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compliance_tier
+    attributes:
+      label: Compliance Tier
+      description: Data sensitivity tier for this epic
+      options:
+        - T1 - Public
+        - T2 - Internal
+        - T3 - Customer Data
+        - T4 - Regulated
+    validations:
+      required: true
+
+  - type: input
+    id: target_version
+    attributes:
+      label: Target Version
+      description: Target release version
+      placeholder: "v1.2.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies or blockers
+      placeholder: |
+        - Depends on #123
+        - Blocked by external API
+    validations:
+      required: false
+
+  - type: textarea
+    id: stakeholders
+    attributes:
+      label: Stakeholders
+      description: List stakeholders and their roles
+      placeholder: |
+        - @owner - Product Owner
+        - @reviewer - Technical Lead
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: risk_flags
+    attributes:
+      label: Risk Flags
+      description: Check all that apply
+      options:
+        - label: Touches auth/authz
+        - label: Destructive migration
+        - label: Payments/billing
+        - label: Regulated data (PII/PHI)
+        - label: UI change (Design Jail applies)
+        - label: Infrastructure change
+        - label: Security-sensitive
+
+  - type: checkboxes
+    id: operator_mode
+    attributes:
+      label: Operator Mode
+      description: Enable automated processing
+      options:
+        - label: Enable Operator Mode processing for this epic
+          required: false
+        - label: Auto-create work item issues
+          required: false
+        - label: Auto-assign to team
+          required: false
