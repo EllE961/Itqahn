@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# mkdocs build output
+site/
+
+# tool outputs
+drift_report.json

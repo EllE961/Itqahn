@@ -1,10 +1,11 @@
 site_name: Itqahn Documentation
 site_description: Autonomous Company-as-Software Platform
 site_url: https://docs.itqahn.io
+docs_dir: ../../docs
 site_author: Itqahn Team
 
-repo_name: itqahn/documentation
-repo_url: https://github.com/itqahn/documentation
+repo_name: EllE961/Itqahn
+repo_url: https://github.com/EllE961/Itqahn
 
 theme:
   name: material

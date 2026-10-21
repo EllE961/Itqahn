@@ -1,0 +1,4 @@
+# tools/validators/evidence_pack_validator.py
+jsonschema>=4.26
+# scripts/make_figures.py
+matplotlib>=3.7
